@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>oscar.de — data engineer</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="stylesheet" href="colors_and_type.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Michroma&display=swap">
+  <style>
+    /* Global font swap to Michroma — keep colors/sizes intact */
+    body, button, input, textarea, select, a, span, div, p, h1, h2, h3, h4, h5, h6, li {
+      font-family: 'Michroma', 'JetBrains Mono', sans-serif !important;
+    }
+    /* Bubbly headings keep Fredoka */
+    .h2-bubbly {
+      font-family: 'Fredoka', system-ui, sans-serif !important;
+      font-weight: 600 !important;
+      letter-spacing: 0 !important;
+    }
+    /* Make every "window" / card background transparent so the starfield bleeds through */
+    .glow-card, .method, [data-window] {
+      background: transparent !important;
+    }
+
+    /* === Mouse hover highlight: zoom + green glow === */
+    .nav-links button,
+    .brand,
+    .glow-card,
+    .glow-link,
+    .glow-btn {
+      transition: transform 200ms var(--ease-out, ease-out),
+                  box-shadow 220ms ease-out,
+                  border-color 220ms ease-out,
+                  color 200ms ease-out;
+    }
+    .nav-links button:hover,
+    .brand:hover,
+    .glow-card:hover,
+    .glow-link:hover {
+      transform: scale(1.05);
+      color: var(--accent) !important;
+      text-shadow: 0 0 8px rgba(0,255,136,0.55);
+    }
+    .glow-card:hover {
+      border-color: var(--accent) !important;
+      box-shadow: 0 0 0 1px rgba(0,255,136,0.5),
+                  0 0 24px rgba(0,255,136,0.25);
+    }
+
+    /* Glowing rounded contact pill */
+    .glow-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 20px;
+      border-radius: 999px !important;
+      border: 1px solid var(--accent) !important;
+      color: var(--accent) !important;
+      background: rgba(0,255,136,0.06);
+      font-family: var(--font-mono);
+      font-weight: 500;
+      cursor: pointer;
+      box-shadow: 0 0 12px rgba(0,255,136,0.18);
+    }
+    .glow-btn:hover {
+      transform: scale(1.06);
+      background: rgba(0,255,136,0.14);
+      box-shadow: 0 0 0 1px rgba(0,255,136,0.6),
+                  0 0 22px rgba(0,255,136,0.45),
+                  0 0 40px rgba(0,255,136,0.2);
+    }
+    .glow-btn svg { fill: currentColor; }
+
+    /* Gray rounded send button with green hover glow */
+    .send-btn {
+      transition: transform 200ms var(--ease-out, ease-out),
+                  box-shadow 220ms ease-out,
+                  border-color 200ms ease-out;
+      box-shadow: 0 0 0 1px transparent;
+    }
+    .send-btn:hover {
+      transform: scale(1.06);
+      border-color: var(--accent) !important;
+      box-shadow: 0 0 0 1px rgba(0,255,136,0.6),
+                  0 0 22px rgba(0,255,136,0.45),
+                  0 0 40px rgba(0,255,136,0.2);
+    }
+    body {
+      background: var(--bg-0);
+      background-image: radial-gradient(circle at 1px 1px, #1a1a1a 1px, transparent 0);
+      background-size: 32px 32px;
+      background-attachment: fixed;
+      margin: 0;
+      position: relative;
+      overflow-x: hidden;
+    }
+    /* Starfield + comets behind everything */
+    #cosmos {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 0;
+    }
+    #root { position: relative; z-index: 1; }
+
+    /* Static twinkling stars */
+    .star {
+      position: absolute; border-radius: 50%;
+      background: #cfe6ff;
+      box-shadow: 0 0 6px rgba(120,180,255,0.8);
+      animation: twinkle var(--tw, 3s) ease-in-out infinite;
+      opacity: 0.7;
+    }
+    .star.blue  { background: #6bb3ff; box-shadow: 0 0 8px rgba(107,179,255,0.9); }
+    .star.bright { background: #ffffff; box-shadow: 0 0 10px rgba(255,255,255,0.95); }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.25; transform: scale(0.85); }
+      50%      { opacity: 1;    transform: scale(1.15); }
+    }
+
+    /* Comet — diagonal streak with a tail */
+    .comet {
+      position: absolute;
+      width: 140px; height: 2px;
+      background: linear-gradient(90deg, transparent 0%, rgba(107,179,255,0.0) 0%, rgba(107,179,255,0.7) 60%, #ffffff 100%);
+      border-radius: 2px;
+      filter: drop-shadow(0 0 6px rgba(107,179,255,0.9));
+      transform-origin: right center;
+      opacity: 0;
+    }
+    .comet::after {
+      content: '';
+      position: absolute; right: -3px; top: -2px;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 0 12px 2px rgba(180,210,255,0.95);
+    }
+    @keyframes comet-fly {
+      0%   { transform: translate(0, 0) rotate(25deg); opacity: 0; }
+      8%   { opacity: 1; }
+      100% { transform: translate(120vw, 56vh) rotate(25deg); opacity: 0; }
+    }
+    .comet.c1 { top:  8%; left: -10%; animation: comet-fly 6s linear infinite; animation-delay: 0s; }
+    .comet.c2 { top: 32%; left: -12%; animation: comet-fly 9s linear infinite; animation-delay: 3.2s; }
+    .comet.c3 { top: 60%; left: -8%;  animation: comet-fly 7.5s linear infinite; animation-delay: 5.5s; }
+
+    a { color: inherit; text-decoration: none; }
+    button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible {
+      outline: none;
+      box-shadow: var(--shadow-focus);
+      border-color: var(--accent) !important;
+    }
+    .method:hover { border-color: var(--accent) !important; }
+    @media (max-width: 760px) {
+      .nav-links { display: none !important; }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>emailjs.init({ publicKey: 'fhvx67dJ1NEbvF2ht' });</script>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div id="cosmos">
+    <div class="comet c1"></div>
+    <div class="comet c2"></div>
+    <div class="comet c3"></div>
+  </div>
+
+  <!-- Background music: plays on first user interaction (autoplay policy) -->
+  <audio id="bg-audio" src="assets/boot.mp3" loop preload="auto"></audio>
+
+  <!-- Mute / unmute toggle -->
+  <button id="audio-toggle" type="button" aria-label="toggle music" title="toggle music"
+    style="position:fixed;bottom:20px;right:20px;z-index:100;
+           width:44px;height:44px;border-radius:50%;
+           background:rgba(10,10,10,0.85);backdrop-filter:blur(8px);
+           border:1px solid #262626;color:#00ff88;
+           font-family:'JetBrains Mono',monospace;font-size:18px;
+           cursor:pointer;display:flex;align-items:center;justify-content:center;
+           transition:border-color 140ms ease, transform 140ms ease;">
+    <span id="audio-icon">♪</span>
+  </button>
+
+  <div id="root"></div>
+
+  <script>
+    // Background music — starts on first user interaction (browsers block autoplay)
+    (function () {
+      const audio  = document.getElementById('bg-audio');
+      const btn    = document.getElementById('audio-toggle');
+      const icon   = document.getElementById('audio-icon');
+      audio.volume = 0.35;
+      let playing  = false;
+
+      const updateIcon = () => { icon.textContent = playing ? '♪' : '♪̸'; btn.style.color = playing ? '#00ff88' : '#6e6e6e'; };
+      // Use simpler glyphs that always render:
+      const setIcon = () => { icon.textContent = playing ? '♪' : '×'; btn.style.color = playing ? '#00ff88' : '#6e6e6e'; };
+      setIcon();
+
+      const start = () => {
+        audio.play().then(() => { playing = true; setIcon(); }).catch(() => {});
+        document.removeEventListener('click', start);
+        document.removeEventListener('keydown', start);
+      };
+      document.addEventListener('click', start);
+      document.addEventListener('keydown', start);
+
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (audio.paused) { audio.play().then(() => { playing = true; setIcon(); }).catch(() => {}); }
+        else              { audio.pause(); playing = false; setIcon(); }
+      });
+      btn.addEventListener('mouseenter', () => { btn.style.borderColor = '#00ff88'; btn.style.transform = 'scale(1.08)'; });
+      btn.addEventListener('mouseleave', () => { btn.style.borderColor = '#262626'; btn.style.transform = 'scale(1)'; });
+    })();
+  </script>
+
+  <script>
+    // Generate ~70 twinkling stars at random positions/sizes
+    (function () {
+      const cosmos = document.getElementById('cosmos');
+      const N = 180;
+      for (let i = 0; i < N; i++) {
+        const s = document.createElement('div');
+        const isBlue   = Math.random() < 0.55;
+        const isBright = Math.random() < 0.12;
+        s.className = 'star' + (isBright ? ' bright' : (isBlue ? ' blue' : ''));
+        const size = isBright ? 2.5 + Math.random() * 1.5 : 1 + Math.random() * 1.8;
+        s.style.width  = size + 'px';
+        s.style.height = size + 'px';
+        s.style.top    = (Math.random() * 100) + 'vh';
+        s.style.left   = (Math.random() * 100) + 'vw';
+        s.style.setProperty('--tw', (2 + Math.random() * 4) + 's');
+        s.style.animationDelay = (Math.random() * 4) + 's';
+        cosmos.appendChild(s);
+      }
+    })();
+  </script>
+
+  <script type="text/babel" src="Nav.jsx"></script>
+  <script type="text/babel" src="Hero.jsx"></script>
+  <script type="text/babel" src="Projects.jsx"></script>
+  <script type="text/babel" src="Skills.jsx"></script>
+  <script type="text/babel" src="Resume.jsx"></script>
+  <script type="text/babel" src="Contact.jsx"></script>
+
+  <script type="text/babel">
+    function App() {
+      return (
+        <>
+          <Nav />
+          <main>
+            <Hero />
+            <Projects />
+            <Skills />
+            <Resume />
+            <Contact />
+          </main>
+        </>
+      );
+    }
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
