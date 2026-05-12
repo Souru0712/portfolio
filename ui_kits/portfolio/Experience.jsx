@@ -4,7 +4,7 @@ const EXPERIENCE = [
     company: 'Luckin Coffee',
     location: 'New York, NY',
     title: 'Assistant Manager',
-    start: 'Dec 2023',
+    start: 'Dec 2025',
     end: 'Apr 2026',
     bullets: [
       'Trained and onboarded 2 new hires per week by developing structured weekly training plans and delegating tasks to build team productivity.',
