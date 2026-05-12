@@ -1,6 +1,6 @@
 {
   "rewrites": [
     { "source": "/", "destination": "/ui_kits/portfolio/index.html" },
-    { "source": "/:path*", "destination": "/ui_kits/portfolio/:path*" }
+    { "source": "/((?!api/).*)", "destination": "/ui_kits/portfolio/$1" }
   ]
 }
