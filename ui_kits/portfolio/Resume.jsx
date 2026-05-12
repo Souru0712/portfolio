@@ -8,9 +8,9 @@ function Resume() {
         <div style={rs.row}>
           <div className="glow-card" style={rs.sideCard}>
             <div style={rs.sideLabel}>quick stats</div>
-            <div style={rs.statRow}><span style={rs.statK}>years coding</span><span style={rs.statV}>7</span></div>
-            <div style={rs.statRow}><span style={rs.statK}>shipped projects</span><span style={rs.statV}>20+</span></div>
-            <div style={rs.statRow}><span style={rs.statK}>languages used</span><span style={rs.statV}>9</span></div>
+            <div style={rs.statRow}><span style={rs.statK}>years coding</span><span style={rs.statV}>4</span></div>
+            <div style={rs.statRow}><span style={rs.statK}>shipped end-to-end pipelines</span><span style={rs.statV}>4+</span></div>
+            <div style={rs.statRow}><span style={rs.statK}>languages used</span><span style={rs.statV}>5</span></div>
             <div style={rs.statRow}><span style={rs.statK}>cups of coffee</span><span style={rs.statV}>∞</span></div>
           </div>
           <div className="glow-card" style={rs.sideCard}>
