@@ -19,7 +19,7 @@ function Experience() {
     <section id="experience" style={ex.section}>
       <div style={ex.container}>
         <h2 className="h2-bubbly" style={ex.h2}><span style={{color:'var(--accent)'}}>◆</span> Experience</h2>
-        <p style={ex.subtitle}>nothing yet but coffee</p>
+        <p style={ex.subtitle}>nothing data related but coffee and management</p>
 
         <div style={ex.list}>
           {EXPERIENCE.map((job, i) => <ExperienceCard key={i} job={job} />)}
