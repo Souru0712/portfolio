@@ -30,8 +30,9 @@ function Nav() {
   const sections = [
     { id: 'about',    label: 'about me'},
     { id: 'projects', label: 'projects'},
-    { id: 'skills',   label: 'skills'  },
-    { id: 'resume',   label: 'resume'  },
+    { id: 'skills',     label: 'skills'     },
+    { id: 'experience', label: 'experience' },
+    { id: 'resume',     label: 'resume'     },
     { id: 'contact',  label: 'contact' },
   ];
 
