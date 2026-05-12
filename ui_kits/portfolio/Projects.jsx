@@ -1,42 +1,42 @@
-// Projects grid with tag filter
-const { useState: useStateProj } = React;
-
-const PROJECTS = [
-  {
-    id: 1, num: '01', name: 'supply-chain-pipeline', status: 'live',
-    blurb: 'end-to-end supply chain data pipeline — ingests vendor feeds, normalizes SKUs, and lands clean fact tables for downstream analytics.',
-    stack: ['python', 'airflow', 'snowflake', 'etl'],
-    demo: null, repo: 'https://github.com/Souru0712',
-  },
-  {
-    id: 2, num: '02', name: 'inventory-management', status: 'live',
-    blurb: 'docker + airflow pipeline that automates inventory deduction and sales reporting against square POS. v2 cut dag runtime from 3min to 2min via batch api calls.',
-    stack: ['python', 'airflow', 'docker', 'square-api'],
-    demo: null, repo: 'https://github.com/Souru0712/Inventory_Management',
-  },
-];
-
-const ALL_TAGS = ['all', 'python', 'airflow', 'docker', 'etl'];
+// Projects grid — data fetched from /api/pinned-repos (GitHub pinned repositories)
+const { useState: useStateProj, useEffect: useEffectProj } = React;
 
 function Projects() {
+  const [projects, setProjects] = useStateProj([]);
   const [filter, setFilter] = useStateProj('all');
-  const filtered = filter === 'all' ? PROJECTS : PROJECTS.filter(p => p.stack.includes(filter));
+  const [loading, setLoading] = useStateProj(true);
+  const [error, setError] = useStateProj(null);
+
+  useEffectProj(() => {
+    fetch('/api/pinned-repos')
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then(data => { setProjects(data); setLoading(false); })
+      .catch(() => { setError('could not load projects'); setLoading(false); });
+  }, []);
+
+  const allTags = ['all', ...new Set(projects.flatMap(p => p.stack))];
+  const filtered = filter === 'all' ? projects : projects.filter(p => p.stack.includes(filter));
 
   return (
     <section id="projects" style={projStyles.section}>
       <div style={projStyles.container}>
         <h2 className="h2-bubbly" style={projStyles.h2}><span style={{color:'var(--accent)'}}>◆</span> Projects</h2>
 
-        <div style={projStyles.filters}>
-          <span style={projStyles.filterLabel}>filter:</span>
-          {ALL_TAGS.map(t => (
-            <button key={t} onClick={() => setFilter(t)} style={{
-              ...projStyles.filterBtn,
-              color: filter === t ? 'var(--accent)' : 'var(--fg-2)',
-              borderColor: filter === t ? 'var(--accent)' : 'var(--border-1)',
-            }}>{t}</button>
-          ))}
-        </div>
+        {!loading && !error && (
+          <div style={projStyles.filters}>
+            <span style={projStyles.filterLabel}>filter:</span>
+            {allTags.map(t => (
+              <button key={t} onClick={() => setFilter(t)} style={{
+                ...projStyles.filterBtn,
+                color: filter === t ? 'var(--accent)' : 'var(--fg-2)',
+                borderColor: filter === t ? 'var(--accent)' : 'var(--border-1)',
+              }}>{t}</button>
+            ))}
+          </div>
+        )}
+
+        {loading && <div style={projStyles.status}>loading projects…</div>}
+        {error && <div style={projStyles.status}>{error}</div>}
 
         <div style={projStyles.grid}>
           {filtered.map(p => <ProjectCard key={p.id} p={p} />)}
@@ -74,8 +74,8 @@ function ProjectCard({ p }) {
         {p.stack.map(s => <span key={s} style={projStyles.tag}>{s}</span>)}
       </div>
       <div style={projStyles.links}>
-        {p.demo && <a href={p.demo} style={projStyles.link}>↗ live demo</a>}
-        {p.repo && <a href={p.repo} style={projStyles.link}>↗ github</a>}
+        {p.demo && <a href={p.demo} target="_blank" rel="noreferrer" style={projStyles.link}>↗ live demo</a>}
+        {p.repo && <a href={p.repo} target="_blank" rel="noreferrer" style={projStyles.link}>↗ github</a>}
       </div>
     </div>
   );
@@ -84,9 +84,7 @@ function ProjectCard({ p }) {
 const projStyles = {
   section: { padding: '64px 0' },
   container: { maxWidth: 'var(--content-max)', margin: '0 auto', padding: '0 var(--gutter-desk)' },
-  kicker: { fontFamily: 'var(--font-mono)', fontSize: 14, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--fg-3)', marginBottom: 12 },
   h2: { fontFamily: 'var(--font-mono)', fontSize: 41, fontWeight: 500, letterSpacing: '-0.01em', marginBottom: 8 },
-  subtitle: { fontFamily: 'Inter, sans-serif', fontSize: 17, color: 'var(--fg-2)', marginBottom: 32 },
   filters: { display: 'flex', gap: 8, alignItems: 'center', marginBottom: 24, flexWrap: 'wrap' },
   filterLabel: { fontFamily: 'var(--font-mono)', fontSize: 14, color: 'var(--fg-3)', marginRight: 4 },
   filterBtn: {
@@ -94,6 +92,7 @@ const projStyles = {
     background: 'transparent', border: '1px solid var(--border-1)',
     borderRadius: 2, cursor: 'pointer', transition: 'all 140ms var(--ease-out)',
   },
+  status: { fontFamily: 'var(--font-mono)', fontSize: 14, color: 'var(--fg-3)', marginBottom: 24 },
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 },
   card: {
     background: 'var(--bg-1)', border: '1px solid var(--border-1)',
