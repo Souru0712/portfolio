@@ -15,7 +15,7 @@ function Resume() {
           </div>
           <div className="glow-card" style={rs.sideCard}>
             <div style={rs.sideLabel}>looking for</div>
-            <div style={rs.lookingFor}>full-time · remote-first · data platform or ML infra teams. <br/><br/>also open to consulting on dbt + airflow setups.</div>
+            <div style={rs.lookingFor}>full-time · remote-first · data engineering or data-related roles. <br/><br/>also open to consulting on S3/Snowflake + dbt + airflow setups.</div>
             <a
               href="assets/oscar_lam_ho_resume.pdf"
               download="Oscar_Lam_Ho_Junior_Data_Engineer.pdf"
