@@ -1,6 +1,63 @@
 // Projects grid — data fetched from /api/pinned-repos (GitHub pinned repositories)
 const { useState: useStateProj, useEffect: useEffectProj } = React;
 
+const FALLBACK_PROJECTS = [
+  {
+    id: 1, num: '01',
+    name: 'mta-subway-reliability-tracker',
+    status: 'live',
+    blurb: 'Tracks and analyzes NYC MTA subway reliability metrics with automated data pipelines.',
+    stack: ['python', 'sql', 'data-engineering'],
+    demo: null,
+    repo: 'https://github.com/Souru0712/MTA-subway-reliability-tracker',
+  },
+  {
+    id: 2, num: '02',
+    name: 'nyc-311-service-equity',
+    status: 'live',
+    blurb: 'Dashboard analyzing NYC 311 service request equity across city boroughs.',
+    stack: ['python', 'streamlit', 'sql'],
+    demo: 'https://nyc-311-service-equity.streamlit.app/',
+    repo: 'https://github.com/Souru0712/NYC-311-service-equity',
+  },
+  {
+    id: 3, num: '03',
+    name: 'inventory-management',
+    status: 'live',
+    blurb: 'Docker-orchestrated system for automatic inventory management and sales reporting.',
+    stack: ['python', 'docker', 'airflow'],
+    demo: null,
+    repo: 'https://github.com/Souru0712/Inventory_Management',
+  },
+  {
+    id: 4, num: '04',
+    name: 'vitals-realtime-datastream',
+    status: 'live',
+    blurb: 'Real-time vitals data streaming pipeline using event-driven architecture.',
+    stack: ['python', 'kafka', 'streaming'],
+    demo: null,
+    repo: 'https://github.com/Souru0712/Vitals-Realtime-Datastream',
+  },
+  {
+    id: 5, num: '05',
+    name: 'local-buzz-event-awareness',
+    status: 'wip',
+    blurb: 'ETL pipeline for aggregating and surfacing local event awareness data.',
+    stack: ['python', 'etl', 'data-engineering'],
+    demo: null,
+    repo: 'https://github.com/Souru0712/Local-buzz-event-awareness',
+  },
+  {
+    id: 6, num: '06',
+    name: 'reddit-posts-engineering',
+    status: 'live',
+    blurb: 'Data engineering pipeline for ingesting and analyzing Reddit posts at scale.',
+    stack: ['python', 'reddit-api', 'etl'],
+    demo: null,
+    repo: 'https://github.com/Souru0712/Reddit_Posts_Engineering',
+  },
+];
+
 function Projects() {
   const [projects, setProjects] = useStateProj([]);
   const [filter, setFilter] = useStateProj('all');
@@ -10,8 +67,11 @@ function Projects() {
   useEffectProj(() => {
     fetch('/api/pinned-repos')
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
-      .then(data => { setProjects(data); setLoading(false); })
-      .catch(() => { setError('could not load projects'); setLoading(false); });
+      .then(data => {
+        setProjects(data && data.length > 0 ? data : FALLBACK_PROJECTS);
+        setLoading(false);
+      })
+      .catch(() => { setProjects(FALLBACK_PROJECTS); setLoading(false); });
   }, []);
 
   const allTags = ['all', ...new Set(projects.flatMap(p => p.stack))];
@@ -36,7 +96,6 @@ function Projects() {
         )}
 
         {loading && <div style={projStyles.status}>loading projects…</div>}
-        {error && <div style={projStyles.status}>{error}</div>}
 
         <div style={projStyles.grid}>
           {filtered.map(p => <ProjectCard key={p.id} p={p} />)}
