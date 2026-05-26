@@ -162,7 +162,7 @@ function Hero() {
         <div style={heroStyles.hintRow}>
           <div style={heroStyles.musicHint}>
             <em>* click the page to play song *</em><br/>
-            <em>song name: Good Night by FASSounds</em>
+            <em>End of Beginning (Instrumental) by Djo</em>
           </div>
           <div style={heroStyles.welcomeWrap}>
           </div>
